@@ -23,7 +23,7 @@ background_logger ()
 {
   (
     while true; do
-      echo "$(date '+%s.%N') $(ibam -r --noprofile --percentbattery|head -1|cut -d' ' -f11) $(cat /proc/loadavg)" >> "$HOME/batterytest.log"
+      echo "$(date '+%s.%N') $(ibam -r --noprofile --percentbattery|head -1|cut -d' ' -f11) $(cat /proc/loadavg)" >> "$DIR/log"
       sleep 6
     done
   ) &>/dev/null &
