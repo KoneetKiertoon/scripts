@@ -11,7 +11,7 @@
 #
 
 URL='https://www.youtube.com/'
-DIR='/dev/shm/batterytest'
+DIR="$HOME/batterytest"
 TMP="$DIR/tmp"
 HTML="$TMP/page.html"
 
