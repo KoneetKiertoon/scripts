@@ -40,7 +40,7 @@ load_logger ()
     [[ -f /proc/loadavg ]] || exit 1
     touch "$RUN/$BASHPID"
     while true; do
-      echo "$(date '+%s.%N') $(cat /proc/loadavg)" >> "$DIR/load.log"
+      echo "$(date '+%s.%N') $(cut -d' ' -f1 /proc/loadavg)" >> "$DIR/load.log"
       sleep 5
     done
   ) &>/dev/null &
