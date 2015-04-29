@@ -21,14 +21,18 @@ HTML="$TMP/page.html"
 #
 batt_logger ()
 {
-  (
-    which ibam || exit 1
-    touch "$RUN/$BASHPID"
-    while true; do
-      echo "$(date '+%s.%N') $(ibam -r --noprofile --percentbattery|head -1|cut -d' ' -f11)" >> "$DIR/batt.log"
-      sleep 5
-    done
-  ) &>/dev/null &
+  if [[ $(which ibam 2>/dev/null) ]]; then
+    (
+      RUNFILE="$RUN/$BASHPID"
+      touch "$RUNFILE"
+      while [[ -f "$RUNFILE" ]]; do
+        echo "$(date '+%s.%N') $(ibam -r --noprofile --percentbattery|head -1|cut -d' ' -f11)" >> "$DIR/batt.log"
+        sleep 5
+      done
+    ) &>/dev/null &
+  else
+    echo "Can't find ibam, battery logging not possible" >&2
+  fi
 }
 
 #
@@ -36,14 +40,18 @@ batt_logger ()
 #
 load_logger ()
 {
-  (
-    [[ -f /proc/loadavg ]] || exit 1
-    touch "$RUN/$BASHPID"
-    while true; do
-      echo "$(date '+%s.%N') $(cut -d' ' -f1 /proc/loadavg)" >> "$DIR/load.log"
-      sleep 5
-    done
-  ) &>/dev/null &
+  if [[ -f /proc/loadavg ]]; then
+    (
+      RUNFILE="$RUN/$BASHPID"
+      touch "$RUNFILE"
+      while [[ -f "$RUNFILE" ]]; do
+        echo "$(date '+%s.%N') $(cut -d' ' -f1 /proc/loadavg)" >> "$DIR/load.log"
+        sleep 5
+      done
+    ) &>/dev/null &
+  else
+    echo "Can't find /proc/loadavg, CPU logging not possible" >&2
+  fi
 }
 
 #
@@ -51,14 +59,20 @@ load_logger ()
 #
 temp_logger ()
 {
-  (
-    ls /sys/class/thermal/thermal_zone*/temp || exit 1
-    touch "$RUN/$BASHPID"
-    while true; do
-      echo $(date '+%s.%N') $(cat /sys/class/thermal/thermal_zone*/temp) >> "$DIR/temp.log"
-      sleep 5
-    done
-  ) &>/dev/null &
+  ls -1 /sys/class/thermal/thermal_zone*/temp 2>/dev/null \
+  | while read x; do
+    N=$(egrep -o '[0-9]+' <<< "$x")
+    (
+      SRC="/sys/class/thermal/thermal_zone$N/temp"
+      DST="$DIR/temp$N.log"
+      RUNFILE="$RUN/$BASHPID"
+      touch "$RUNFILE"
+      while [[ -f "$RUNFILE" ]]; do
+        echo $(date '+%s.%N') $(cat "$SRC") >> "$DST"
+        sleep 5
+      done
+    ) &>/dev/null &
+  done
 }
 
 #
