@@ -145,13 +145,13 @@ while true; do
   get_vids_from_html
   get_random_url_from_vids
 
+  rm ${TMP}/*
+
   if youtube-dl --no-cache-dir --no-playlist --ignore-config \
                 -o "$TMP/vid.%(ext)s" "$URL"; then
     VID="$TMP/$(ls -1tr "$TMP/"|grep -v "html$"|tail -1)"
     mpv --fs "$VID"
   fi
-
-  rm ${TMP}/*
 
   get_html_from_url
 done
