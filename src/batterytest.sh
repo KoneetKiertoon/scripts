@@ -76,6 +76,30 @@ temp_logger ()
 }
 
 #
+# Log network interface traffic (number of sent and received bytes).
+#
+xmit_logger ()
+{
+  ls -1 /sys/class/net/*[0-9]/statistics/[rt]x_bytes 2>/dev/null \
+  | while read x; do
+    X="${x%x_bytes}"
+    X="${X##*/}"
+    I="${x#/sys/class/net/}"
+    I="${I%%/*}"
+    (
+      SRC="$x"
+      DST="$DIR/${X}x_$I.log"
+      RUNFILE="$RUN/$BASHPID"
+      touch "$RUNFILE"
+      while [[ -f "$RUNFILE" ]]; do
+        echo $(date '+%s.%N') $(cat "$SRC") >> "$DST"
+        sleep 5
+      done
+    ) &>/dev/null &
+  done
+}
+
+#
 # Download the HTML page that $URL points to.
 # The page is written to the file $HTML.
 #
@@ -115,6 +139,7 @@ fi
 batt_logger
 load_logger
 temp_logger
+xmit_logger
 
 while true; do
   get_vids_from_html
