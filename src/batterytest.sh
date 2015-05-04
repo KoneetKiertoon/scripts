@@ -23,11 +23,18 @@ batt_logger ()
 {
   if [[ $(which ibam 2>/dev/null) ]]; then
     (
+      DST="$DIR/batt.log"
       RUNFILE="$RUN/$BASHPID"
       touch "$RUNFILE"
+      PREV="$(ibam -r --noprofile --percentbattery|head -1|cut -d' ' -f11)"
+      echo "$(date '+%s.%N') $PREV" >> "$DST"
       while [[ -f "$RUNFILE" ]]; do
-        echo "$(date '+%s.%N') $(ibam -r --noprofile --percentbattery|head -1|cut -d' ' -f11)" >> "$DIR/batt.log"
         sleep 5
+        IBAM="$(ibam -r --noprofile --percentbattery|head -1|cut -d' ' -f11)"
+        if [[ "$IBAM" != "$PREV" ]]; then
+          echo "$(date '+%s.%N') $IBAM" >> "$DST"
+          PREV="$IBAM"
+        fi
       done
     ) &>/dev/null &
   else
@@ -67,9 +74,15 @@ temp_logger ()
       DST="$DIR/temp$N.log"
       RUNFILE="$RUN/$BASHPID"
       touch "$RUNFILE"
+      PREV=$(cat "$SRC")
+      echo $(date '+%s.%N') $PREV >> "$DST"
       while [[ -f "$RUNFILE" ]]; do
-        echo $(date '+%s.%N') $(cat "$SRC") >> "$DST"
         sleep 5
+        TEMP=$(cat "$SRC")
+        if [[ "$TEMP" != "$PREV" ]]; then
+          echo $(date '+%s.%N') ${TEMP} >> "$DST"
+          PREV="$TEMP"
+        fi
       done
     ) &>/dev/null &
   done
