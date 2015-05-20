@@ -7,7 +7,15 @@
 # Author: Juuso Alasuutari
 # License: GPLv3
 #
-# Depends on: curl, ibam, youtube-dl, mplayer2
+# Depends on: curl, ibam, youtube-dl*, mplayer2
+#
+# *) NOTICE: If you run this on Ubuntu 12.04 you can't use the stock
+#    youtube-dl package. You need a more recent version. Install one
+#    from Webupd8's repository:
+#
+#    # apt-add-repository ppa:nilarimogard/webupd8
+#    # apt-get update
+#    # apt-get install youtube-dl
 #
 
 URL='https://www.youtube.com/'
