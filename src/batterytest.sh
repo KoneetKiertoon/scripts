@@ -75,10 +75,14 @@ temp_logger ()
       RUNFILE="$RUN/$BASHPID"
       touch "$RUNFILE"
       PREV=$(cat "$SRC")
+      LEN="$((${#PREV}-3))"
+      PREV="${PREV:0:LEN}.${PREV:LEN}"
       echo $(date '+%s.%N') $PREV >> "$DST"
       while [[ -f "$RUNFILE" ]]; do
         sleep 5
         TEMP=$(cat "$SRC")
+        LEN="$((${#TEMP}-3))"
+        TEMP="${TEMP:0:LEN}.${TEMP:LEN}"
         if [[ "$TEMP" != "$PREV" ]]; then
           echo $(date '+%s.%N') ${TEMP} >> "$DST"
           PREV="$TEMP"
