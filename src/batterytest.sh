@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# Drain battery by opening Youtube pages in Firefox.
-# The purpose of this is to emulate casual computer
-# use and measure battery life.
+# Drain battery by downloading Youtube videos and playing them
+# fullscreen. The purpose of this is to emulate casual computer
+# use to measure battery life.
 #
 # Author: Juuso Alasuutari
 # License: GPLv3
