@@ -167,8 +167,7 @@ while true; do
   if youtube-dl --no-cache-dir --no-playlist --ignore-config \
                 -o "$TMP/vid.%(ext)s" "$URL"; then
     VID="$TMP/$(ls -1tr "$TMP/"|grep -v "html$"|tail -1)"
-    mplayer2 --fs --ao=null "$VID"
-#    mpv --fs --volume=0 --mute=yes "$VID"
+    mplayer --fs --ao=null "$VID"
   fi
 
   get_html_from_url
