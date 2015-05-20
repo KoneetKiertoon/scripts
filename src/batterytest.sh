@@ -7,7 +7,7 @@
 # Author: Juuso Alasuutari
 # License: GPLv3
 #
-# Depends on: curl, ibam, youtube-dl, mpv
+# Depends on: curl, ibam, youtube-dl, mplayer2
 #
 
 URL='https://www.youtube.com/'
@@ -167,7 +167,8 @@ while true; do
   if youtube-dl --no-cache-dir --no-playlist --ignore-config \
                 -o "$TMP/vid.%(ext)s" "$URL"; then
     VID="$TMP/$(ls -1tr "$TMP/"|grep -v "html$"|tail -1)"
-    mpv --fs --volume=0 --mute=yes "$VID"
+    mplayer2 --fs --ao=null "$VID"
+#    mpv --fs --volume=0 --mute=yes "$VID"
   fi
 
   get_html_from_url
