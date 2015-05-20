@@ -53,21 +53,28 @@ batt_logger ()
 }
 
 #
-# Log timestamp and load average every five seconds.
+# Log timestamp and CPU utilization.
 #
-load_logger ()
+cpu_logger ()
 {
-  if [[ -f /proc/loadavg ]]; then
+  if [[ -f /proc/stat ]]; then
     (
       RUNFILE="$RUN/$BASHPID"
       touch "$RUNFILE"
+      read a b c d _e z < /proc/stat
+      ((_t=b+c+d+_e))
       while [[ -f "$RUNFILE" ]]; do
-        echo "$(date '+%s.%N') $(cut -d' ' -f1 /proc/loadavg)" >> "$DIR/load.log"
-        sleep 5
+        read a b c d e z < /proc/stat
+        ((t=b+c+d+e))
+        ((dt=t-_t))
+        echo "$(date '+%s.%N') $(bc -l <<< $((100*(dt-(e-_e)))).0/${dt}.0)" >> "$DIR/cpu.log"
+        ((_t=t))
+        ((_e=e))
+        sleep 1
       done
     ) &>/dev/null &
   else
-    echo "Can't find /proc/loadavg, CPU logging not possible" >&2
+    echo "Can't find /proc/stat, CPU logging not possible" >&2
   fi
 }
 
@@ -163,10 +170,8 @@ if ! get_html_from_url; then
   exit 1
 fi
 
-NUM_CORES=$(grep '^core id' /proc/cpuinfo|sort -u|wc -l)
-
+cpu_logger
 batt_logger
-load_logger
 temp_logger
 xmit_logger
 
