@@ -17,8 +17,6 @@
 #    # apt-get update
 #    # apt-get install youtube-dl
 #
-# TODO: X=$(cat /proc/loadavg |cut -d' ' -f1); bc -l <<< "(100*$X)/2"|sed -r 's|([1-9])0+$|\1|'
-#
 
 URL='https://www.youtube.com/'
 DIR="$HOME/batterytest"
