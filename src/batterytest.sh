@@ -24,6 +24,8 @@ TMP="$DIR/tmp"
 RUN="$DIR/run"
 HTML="$TMP/page.html"
 
+TIME="$(date +%s.%N)"
+
 #
 # Log timestamp and battery level every five seconds.
 #
@@ -34,13 +36,17 @@ batt_logger ()
       DST="$DIR/batt.log"
       RUNFILE="$RUN/$BASHPID"
       touch "$RUNFILE"
+      T="$(date +%s.%N)"
       PREV="$(ibam -r --noprofile --percentbattery|head -1|cut -d' ' -f11)"
-      echo "$(date '+%s.%N') $PREV" >> "$DST"
+      T="$(bc -l <<< "($T-$TIME)/60"|sed -r 's|([1-9]\|\.0)0+$|\1|')"
+      echo "$T $PREV" >> "$DST"
       while [[ -f "$RUNFILE" ]]; do
         sleep 5
+        T="$(date +%s.%N)"
         IBAM="$(ibam -r --noprofile --percentbattery|head -1|cut -d' ' -f11)"
         if [[ "$IBAM" != "$PREV" ]]; then
-          echo "$(date '+%s.%N') $IBAM" >> "$DST"
+          T="$(bc -l <<< "($T-$TIME)/60"|sed -r 's|([1-9]\|\.0)0+$|\1|')"
+          echo "$T $IBAM" >> "$DST"
           PREV="$IBAM"
         fi
       done
@@ -62,10 +68,13 @@ cpu_logger ()
       read a b c d _e z < /proc/stat
       ((_t=b+c+d+_e))
       while [[ -f "$RUNFILE" ]]; do
+        T="$(date +%s.%N)"
         read a b c d e z < /proc/stat
         ((t=b+c+d+e))
         ((dt=t-_t))
-        echo "$(date '+%s.%N') $(bc -l <<< $((100*(dt-(e-_e)))).0/${dt}.0)" >> "$DIR/cpu.log"
+        T="$(bc -l <<< "($T-$TIME)/60"|sed -r 's|([1-9]\|\.0)0+$|\1|')"
+        V="$(bc -l <<< "$((100*(dt-(e-_e)))).0/${dt}.0"|sed -r 's|([1-9]\|\.0)0+$|\1|')"
+        echo "$T $V" >> "$DIR/cpu.log"
         ((_t=t))
         ((_e=e))
         sleep 1
@@ -89,17 +98,21 @@ temp_logger ()
       DST="$DIR/temp$N.log"
       RUNFILE="$RUN/$BASHPID"
       touch "$RUNFILE"
+      T="$(date +%s.%N)"
       PREV=$(cat "$SRC")
       LEN="$((${#PREV}-3))"
       PREV="${PREV:0:LEN}.${PREV:LEN}"
-      echo $(date '+%s.%N') $PREV >> "$DST"
+      T="$(bc -l <<< "($T-$TIME)/60"|sed -r 's|([1-9]\|\.0)0+$|\1|')"
+      echo "$T $PREV" >> "$DST"
       while [[ -f "$RUNFILE" ]]; do
         sleep 5
+        T="$(date +%s.%N)"
         TEMP=$(cat "$SRC")
         LEN="$((${#TEMP}-3))"
         TEMP="${TEMP:0:LEN}.${TEMP:LEN}"
         if [[ "$TEMP" != "$PREV" ]]; then
-          echo $(date '+%s.%N') ${TEMP} >> "$DST"
+          T="$(bc -l <<< "($T-$TIME)/60"|sed -r 's|([1-9]\|\.0)0+$|\1|')"
+          echo "$T $TEMP" >> "$DST"
           PREV="$TEMP"
         fi
       done
@@ -124,7 +137,10 @@ xmit_logger ()
       RUNFILE="$RUN/$BASHPID"
       touch "$RUNFILE"
       while [[ -f "$RUNFILE" ]]; do
-        echo $(date '+%s.%N') $(cat "$SRC") >> "$DST"
+        T="$(date +%s.%N)"
+        V="$(cat "$SRC")"
+        T="$(bc -l <<< "($T-$TIME)/60"|sed -r 's|([1-9]\|\.0)0+$|\1|')"
+        echo "$T $V" >> "$DST"
         sleep 5
       done
     ) &>/dev/null &
