@@ -180,7 +180,12 @@ get_random_url_from_vids ()
 
 mkdir -p "$LOGDIR" || exit 1
 mkdir -p "$TMP" || exit 1
-mkdir -p "$RUN" || exit 1
+
+if [[ -d "$RUN" ]]; then
+  rm -f "$RUN"/* &>/dev/null
+else
+  mkdir -p "$RUN" || exit 1
+fi
 
 if ! get_html_from_url; then
   exit 1
