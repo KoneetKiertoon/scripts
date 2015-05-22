@@ -196,8 +196,12 @@ get_vids_from_html ()
 #
 get_random_url_from_vids ()
 {
-  local n=${#VIDS[@]}
-  local r=$(($RANDOM % $n))
+  local r n=${#VIDS[@]}
+  if (( n > 0 )); then
+    r=$(($RANDOM % $n))
+  else
+    r=0
+  fi
   URL="https://www.youtube.com/watch?v=${VIDS[r]}"
 }
 
