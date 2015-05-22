@@ -178,6 +178,7 @@ get_random_url_from_vids ()
   URL="https://www.youtube.com/watch?v=${VIDS[r]}"
 }
 
+mkdir -p "$LOGDIR" || exit 1
 mkdir -p "$TMP" || exit 1
 mkdir -p "$RUN" || exit 1
 
