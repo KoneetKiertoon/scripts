@@ -7,7 +7,7 @@
 # Author: Juuso Alasuutari
 # License: GPLv3
 #
-# Depends on: curl, ibam, youtube-dl*, mplayer2
+# Depends on: curl, ibam, youtube-dl*, mplayer2, xdotool
 #
 # *) NOTICE: If you run this on Ubuntu 12.04 you can't use the stock
 #    youtube-dl package. You need a more recent version. Install one
@@ -149,6 +149,33 @@ xmit_logger ()
 }
 
 #
+# Move the mouse cursor around to prevent inactivity triggers.
+#
+sleep_deprivation ()
+{
+  (
+    RUNFILE="$RUN/$BASHPID"
+    touch "$RUNFILE"
+    for ((y=0;;)); do
+      [[ -f "$RUNFILE" ]] || break
+      for ((x=0; y < 180; y++)); do
+        for ((k=0; k < 2; k++, x++)); do
+          xdotool mousemove --polar $x $y
+          sleep 0.005
+        done
+      done
+      [[ -f "$RUNFILE" ]] || break
+      for ((x=0; y > 0; y--)); do
+        for ((k=0; k < 2; k++, x++)); do
+          xdotool mousemove --polar $x $y
+          sleep 0.005
+        done
+      done
+    done
+  ) &>/dev/null &
+}
+
+#
 # Download the HTML page that $URL points to.
 # The page is written to the file $HTML.
 #
@@ -195,6 +222,7 @@ cpu_logger
 batt_logger
 temp_logger
 xmit_logger
+sleep_deprivation
 
 while true; do
   get_vids_from_html
