@@ -158,18 +158,14 @@ sleep_deprivation ()
     touch "$RUNFILE"
     for ((y=0;;)); do
       [[ -f "$RUNFILE" ]] || break
-      for ((x=0; y < 180; y++)); do
-        for ((k=0; k < 2; k++, x++)); do
-          xdotool mousemove --polar $x $y
-          sleep 0.005
-        done
+      for ((x=0; y < 180; y++, x++)); do
+        xdotool mousemove --polar $x $y
+        sleep 0.05
       done
       [[ -f "$RUNFILE" ]] || break
-      for ((x=0; y > 0; y--)); do
-        for ((k=0; k < 2; k++, x++)); do
-          xdotool mousemove --polar $x $y
-          sleep 0.005
-        done
+      for ((; y > 0; y--, x++)); do
+        xdotool mousemove --polar $x $y
+        sleep 0.05
       done
     done
   ) &>/dev/null &
