@@ -18,13 +18,14 @@
 #    # apt-get install youtube-dl
 #
 
+TIME="$(date +%s.%N)"
+
 URL='https://www.youtube.com/'
 DIR="$HOME/batterytest"
+LOGDIR="$DIR/$TIME"
 TMP="$DIR/tmp"
 RUN="$DIR/run"
 HTML="$TMP/page.html"
-
-TIME="$(date +%s.%N)"
 
 #
 # Log timestamp and battery level every five seconds.
@@ -33,7 +34,7 @@ batt_logger ()
 {
   if [[ $(which ibam 2>/dev/null) ]]; then
     (
-      DST="$DIR/batt.log"
+      DST="$LOGDIR/batt.log"
       RUNFILE="$RUN/$BASHPID"
       touch "$RUNFILE"
       T="$(date +%s.%N)"
@@ -74,7 +75,7 @@ cpu_logger ()
         ((dt=t-_t))
         T="$(bc -l <<< "($T-$TIME)/60"|sed -r 's|([1-9]\|\.0)0+$|\1|')"
         V="$(bc -l <<< "$((100*(dt-(e-_e)))).0/${dt}.0"|sed -r 's|([1-9]\|\.0)0+$|\1|')"
-        echo "$T $V" >> "$DIR/cpu.log"
+        echo "$T $V" >> "$LOGDIR/cpu.log"
         ((_t=t))
         ((_e=e))
         sleep 1
@@ -95,7 +96,7 @@ temp_logger ()
     N=$(egrep -o '[0-9]+' <<< "$x")
     (
       SRC="/sys/class/thermal/thermal_zone$N/temp"
-      DST="$DIR/temp$N.log"
+      DST="$LOGDIR/temp$N.log"
       RUNFILE="$RUN/$BASHPID"
       touch "$RUNFILE"
       T="$(date +%s.%N)"
@@ -133,7 +134,7 @@ xmit_logger ()
     I="${I%%/*}"
     (
       SRC="$x"
-      DST="$DIR/${X}x_$I.log"
+      DST="$LOGDIR/${X}x_$I.log"
       RUNFILE="$RUN/$BASHPID"
       touch "$RUNFILE"
       while [[ -f "$RUNFILE" ]]; do
