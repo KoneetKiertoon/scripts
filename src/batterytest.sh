@@ -22,7 +22,6 @@ TIME="$(date +%s.%N)"
 
 URL='https://www.youtube.com/'
 DIR="$HOME/batterytest"
-LOGDIR="$DIR/$TIME"
 TMP="$DIR/tmp"
 RUN="$DIR/run"
 HTML="$TMP/page.html"
@@ -205,40 +204,69 @@ get_random_url_from_vids ()
   URL="https://www.youtube.com/watch?v=${VIDS[r]}"
 }
 
-mkdir -p "$LOGDIR" || exit 1
-mkdir -p "$TMP" || exit 1
+#
+# Run the battery test.
+#
+run_test ()
+{
+  LOGDIR="$DIR/$TIME"
 
-if [[ -d "$RUN" ]]; then
-  rm -f "$RUN"/* &>/dev/null
-else
-  mkdir -p "$RUN" || exit 1
-fi
+  mkdir -p "$LOGDIR" || exit 1
+  mkdir -p "$TMP" || exit 1
 
-if ! get_html_from_url; then
-  exit 1
-fi
-
-cpu_logger
-batt_logger
-temp_logger
-xmit_logger
-sleep_deprivation
-
-while true; do
-  get_vids_from_html
-  get_random_url_from_vids
-
-  rm ${TMP}/*
-
-  if youtube-dl --no-cache-dir --no-playlist --ignore-config \
-                -o "$TMP/vid.%(ext)s" "$URL"; then
-    VID="$TMP/$(ls -1tr "$TMP/"|grep -v "html$"|tail -1)"
-    xset s off
-    xset -dpms
-    mplayer --fs --ao=null "$VID"
-    xset s
-    xset +dpms
+  if [[ -d "$RUN" ]]; then
+    rm -f "$RUN"/* &>/dev/null
+  else
+    mkdir -p "$RUN" || exit 1
   fi
 
-  get_html_from_url
-done
+  if ! get_html_from_url; then
+    exit 1
+  fi
+
+  cpu_logger
+  batt_logger
+  temp_logger
+  xmit_logger
+  sleep_deprivation
+
+  while true; do
+    get_vids_from_html
+    get_random_url_from_vids
+
+    rm ${TMP}/*
+
+    if youtube-dl --no-cache-dir --no-playlist --ignore-config \
+                  -o "$TMP/vid.%(ext)s" "$URL"; then
+      VID="$TMP/$(ls -1tr "$TMP/"|grep -v "html$"|tail -1)"
+      xset s off
+      xset -dpms
+      mplayer --fs --ao=null "$VID"
+      xset s
+      xset +dpms
+    fi
+
+    get_html_from_url
+  done
+}
+
+print_results ()
+{
+  LOGDIR="$(ls -1dr "$DIR"/[0-9]*\.[0-9]*|head -1)"
+  if [[ -z $LOGDIR ]]; then
+    echo 'No results found' >&2
+    exit 1
+  fi
+  TIME="${LOGDIR##*/}"
+
+  # todo
+  echo $LOGDIR
+  echo $TIME
+  exit 0
+}
+
+if [[ "$1" == '-r' ]]; then
+  print_results
+else
+  run_test
+fi
