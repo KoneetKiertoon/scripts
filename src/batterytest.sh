@@ -9,9 +9,9 @@
 #
 # Depends on: curl, ibam, youtube-dl*, mplayer2, xdotool
 #
-# *) NOTICE: If you run this on Ubuntu 12.04 you can't use the stock
-#    youtube-dl package. You need a more recent version. Install one
-#    from Webupd8's repository:
+# *) NOTICE: If you run this on Ubuntu 14.04 or older you can't use
+#    the stock youtube-dl package. You need a more recent version.
+#    Install one from Webupd8's repository:
 #
 #    # apt-add-repository ppa:nilarimogard/webupd8
 #    # apt-get update
