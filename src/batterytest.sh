@@ -252,17 +252,37 @@ run_test ()
 
 print_results ()
 {
+  # get path to most recent test run's log files
   LOGDIR="$(ls -1dr "$DIR"/[0-9]*\.[0-9]* 2>/dev/null|head -1)"
   if [[ -z $LOGDIR ]]; then
     echo 'No results found' >&2
     exit 1
   fi
-  TIME="${LOGDIR##*/}"
 
-  # todo
-  echo $LOGDIR
-  echo $TIME
-  exit 0
+  # get path to most recently modified log file
+  x="$(ls -1tr "$LOGDIR"/*.log 2>/dev/null|tail -1)"
+  if [[ -z $x ]]; then
+    echo 'No results found' >&2
+    exit 1
+  fi
+
+  TIME="${LOGDIR##*/}"
+  ENDTIME="$(tail -1 "$x"|cut -d' ' -f1)"
+  H="$((${ENDTIME%%.*}/60))"
+  M="$((${ENDTIME%%.*}%60))"
+  S="$(bc -l <<< "60*0.${ENDTIME##*.}")"
+
+  x="$(wc -l "$LOGDIR/cpu.log"|cut -d' ' -f1)"
+  LEN=$((x-1))
+  SUM=0
+  while read x; do
+    SUM="$(bc -l <<< "$SUM+${x##* }")"
+  done <<< "$(tail -$LEN "$LOGDIR/cpu.log")"
+
+  echo "Start:    $(date -d "@$TIME")"
+  echo "End:      $(date -d "@$(bc -l <<< "$TIME+(60*$ENDTIME)")")"
+  echo "Duration: ${H}h ${M}m ${S}s"
+  echo "CPU avg:  $(bc -l <<< "$SUM/$LEN")"
 }
 
 if [[ "$1" == '-r' ]]; then
