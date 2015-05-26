@@ -252,7 +252,7 @@ run_test ()
 
 print_results ()
 {
-  LOGDIR="$(ls -1dr "$DIR"/[0-9]*\.[0-9]*|head -1)"
+  LOGDIR="$(ls -1dr "$DIR"/[0-9]*\.[0-9]* 2>/dev/null|head -1)"
   if [[ -z $LOGDIR ]]; then
     echo 'No results found' >&2
     exit 1
