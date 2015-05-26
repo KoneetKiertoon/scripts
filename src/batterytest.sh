@@ -267,17 +267,17 @@ print_results ()
   fi
 
   TIME="${LOGDIR##*/}"
-  ENDTIME="$(tail -1 "$x"|cut -d' ' -f1)"
+  ENDTIME="$(egrep '^([0-9]*\.[0-9]+|[0-9]+(\.[0-9]*)?) ([0-9]*\.[0-9]+|[0-9]+(\.[0-9]*)?)$' "$x"|tail -1|cut -d' ' -f1)"
   H="$((${ENDTIME%%.*}/60))"
   M="$((${ENDTIME%%.*}%60))"
   S="$(bc -l <<< "60*0.${ENDTIME##*.}")"
 
-  x="$(wc -l "$LOGDIR/cpu.log"|cut -d' ' -f1)"
-  LEN=$((x-1))
+  CPULOG="$(egrep '^([0-9]*\.[0-9]+|[0-9]+(\.[0-9]*)?) ([0-9]*\.[0-9]+|[0-9]+(\.[0-9]*)?)$' "$LOGDIR/cpu.log")"
+  LEN="$(wc -l <<< "$CPULOG"|cut -d' ' -f1)"
   SUM=0
   while read x; do
     SUM="$(bc -l <<< "$SUM+${x##* }")"
-  done <<< "$(tail -$LEN "$LOGDIR/cpu.log")"
+  done <<< "$CPULOG"
 
   echo "Start:    $(date -d "@$TIME")"
   echo "End:      $(date -d "@$(bc -l <<< "$TIME+(60*$ENDTIME)")")"
