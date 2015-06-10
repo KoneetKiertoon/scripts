@@ -1,5 +1,7 @@
 #!/bin/bash
 
+shopt -s extglob
+
 if [[ $USER != root ]]; then
   gksu -m 'Password:' "$0"
   exit 0
@@ -12,7 +14,7 @@ fi
 
 parse_lshw()
 {
-  local i c x n JSON LEN DEPTH NAME VALUE
+  local i c x n JSON LEN DEPTH NAME VALUE ID CLASS PRODUCT CPU DESCRIPTION CORES SIZE UNITS
 
   readarray -t i
   JSON="${i[@]}"
@@ -29,7 +31,6 @@ parse_lshw()
       ;;
 
     '['|'{')
-      echo -n "$c"
       (( DEPTH++ ))
       (( i++ ))
       continue
@@ -37,7 +38,23 @@ parse_lshw()
 
     ']'|'}')
       (( DEPTH > 0 )) || return 1
-      echo -n "$c"
+      case "${CLASS[DEPTH]}" in
+      'memory')
+        if [[ "${ID[DEPTH]:0:5}" == 'bank:' && -n "${SIZE[DEPTH]}" ]]; then
+          echo "RAM:   ${ID[DEPTH]}: ${DESCRIPTION[DEPTH]} ${SIZE[DEPTH]} ${UNITS[DEPTH]}"
+        fi
+        ;;
+      'processor')
+        CPU="CPU:   ${PRODUCT[DEPTH]//+([ $'\t'])/ }"$'\n'"Cores: $CORES"
+        echo "$CPU"
+        ;;
+      esac
+      CLASS[DEPTH]=
+      DESCRIPTION[DEPTH]=
+      ID[DEPTH]=
+      PRODUCT[DEPTH]=
+      SIZE[DEPTH]=
+      UNITS[DEPTH]=
       (( DEPTH-- ))
       (( i++ ))
       continue
@@ -53,7 +70,7 @@ parse_lshw()
       done
       (( n=i-x ))
       (( i++ ))
-      NAME[DEPTH]="${JSON:x:n}"
+	  NAME="${JSON:x:n}"
 
       # skip whitespace and colon
       for ((;; i++)); do
@@ -82,8 +99,7 @@ parse_lshw()
           break
         done
         (( n=i-x ))
-        VALUE[DEPTH]="${JSON:x:n}"
-        echo -n "\"${NAME[DEPTH]}\":${VALUE[DEPTH]}"
+        VALUE="${JSON:x:n}"
         ;;
 
       '"') # string
@@ -95,13 +111,10 @@ parse_lshw()
         done
         (( n=i-x ))
         (( i++ ))
-        VALUE[DEPTH]="\"${JSON:x:n}\""
-        echo -n "\"${NAME[DEPTH]}\":${VALUE[DEPTH]}"
+        VALUE="${JSON:x:n}"
         ;;
 
       '['|'{') # array or object
-        VALUE[DEPTH]="$c"
-        echo -n "\"${NAME[DEPTH]}\":${VALUE[DEPTH]}"
         (( DEPTH++ ))
         (( i++ ))
         continue
@@ -110,8 +123,7 @@ parse_lshw()
       'f') # false
         (( i++ ))
         if [[ "${JSON:i:4}" == 'alse' ]]; then
-          VALUE[DEPTH]='false'
-          echo -n "\"${NAME[DEPTH]}\":${VALUE[DEPTH]}"
+          VALUE='false'
           (( i += 4 ))
         else
           return 8
@@ -121,8 +133,7 @@ parse_lshw()
       'n') # null
         (( i++ ))
         if [[ "${JSON:i:3}" == 'ull' ]]; then
-          VALUE[DEPTH]='null'
-          echo -n "\"${NAME[DEPTH]}\":${VALUE[DEPTH]}"
+          VALUE='null'
           (( i += 3 ))
         else
           return 8
@@ -132,8 +143,7 @@ parse_lshw()
       't') # true
         (( i++ ))
         if [[ "${JSON:i:3}" == 'rue' ]]; then
-          VALUE[DEPTH]='true'
-          echo -n "\"${NAME[DEPTH]}\":${VALUE[DEPTH]}"
+          VALUE='true'
           (( i += 3 ))
         else
           return 8
@@ -142,11 +152,33 @@ parse_lshw()
 
       *) return 8 ;;
       esac
+
+      case "$NAME" in
+      'class')
+        CLASS[DEPTH]="$VALUE"
+        ;;
+      'cores')
+        CORES="$VALUE"
+        ;;
+      'description')
+        DESCRIPTION[DEPTH]="$VALUE"
+        ;;
+      'id')
+        ID[DEPTH]="$VALUE"
+        ;;
+      'product')
+        PRODUCT[DEPTH]="$VALUE"
+        ;;
+      'size')
+        SIZE[DEPTH]="$VALUE"
+        ;;
+      'units')
+        UNITS[DEPTH]="$VALUE"
+        ;;
+      esac
       ;;
 
-    ,) echo -n "$c"
-       (( i++ ))
-       ;;
+    ,) (( i++ )) ;;
 
     *) return 8 ;;
     esac
