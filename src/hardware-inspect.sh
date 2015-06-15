@@ -218,28 +218,35 @@ generate_html()
       .component {
         display: block;
         overflow: hidden;
-        border: 1px solid grey;
-        padding: 2px;
-        margin: 0px;
+        border: 0.2mm solid grey;
+        padding: 0.2mm;
+        margin: 0mm;
         width: '"$WIDTH_MM"'mm;
+        background-color: #000000;
       }
       .row {
+        padding: 0.2mm;
+        margin: 0.2mm;
+        background-color: #ffffff;
       }
       .name {
-        border: 0px solid;
+        border: 0mm solid;
         font-family: "DejaVu Sans Mono", "Liberation Mono", Courier, monospace;
         font-weight: bold;
         text-align: center;
         float: left;
         width: '"$NAME_WIDTH_MM"'mm;
-        background-color: lightgrey;
-        padding: 1px;
+        background-color: #d8d8d8;
+        margin: 0.2mm;
+        padding: 0.2mm;
       }
       .value {
-        border: 0px solid;
+        border: 0mm solid;
         font-family: "DejaVu Sans Mono", "Liberation Mono", Courier, monospace;
         text-align: center;
-        padding: 1px;
+        background-color: #ffffff;
+        padding: 0.2mm;
+        margin: 0.2mm;
         margin-left: '"$NAME_WIDTH_MM"'mm;
       }
     </style>
@@ -249,11 +256,11 @@ generate_html()
   echo '    <section class="component">'
   for ((i = 0; i < ${#SCREENS[@]}; i++)); do
     echo '      <div class="row">
-        <aside class="name">'"${SCREENS[i]}"'</div>
+        <aside class="name">'"${SCREENS[i]}"'</aside>
         <div class="value">'"${RESOLUTIONS[i]}"'</div>
       </div>'
   done
-  echo '    </div>'
+  echo '    </section>'
 
   echo '  </body>
 </html>'
