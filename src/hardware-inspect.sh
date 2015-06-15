@@ -205,7 +205,9 @@ parse_lshw()
 
 generate_html()
 {
-  local i
+  local i WIDTH_MM NAME_WIDTH_MM
+  ((WIDTH_MM=105))
+  ((NAME_WIDTH_MM=20))
 
   echo '<!DOCTYPE html>
 <html>
@@ -214,10 +216,12 @@ generate_html()
     <title>Hardware info</title>
     <style>
       .component {
+        display: block;
+        overflow: hidden;
         border: 1px solid grey;
         padding: 2px;
         margin: 0px;
-        width: 105mm;
+        width: '"$WIDTH_MM"'mm;
       }
       .row {
       }
@@ -225,9 +229,9 @@ generate_html()
         border: 0px solid;
         font-family: "DejaVu Sans Mono", "Liberation Mono", Courier, monospace;
         font-weight: bold;
-        text-align: right;
+        text-align: center;
         float: left;
-        width: 20mm;
+        width: '"$NAME_WIDTH_MM"'mm;
         background-color: lightgrey;
         padding: 1px;
       }
@@ -235,18 +239,17 @@ generate_html()
         border: 0px solid;
         font-family: "DejaVu Sans Mono", "Liberation Mono", Courier, monospace;
         text-align: center;
-        width: auto;
         padding: 1px;
-        margin: 1px;
+        margin-left: '"$NAME_WIDTH_MM"'mm;
       }
     </style>
   </head>
   <body>'
 
-  echo '    <div class="component">'
+  echo '    <section class="component">'
   for ((i = 0; i < ${#SCREENS[@]}; i++)); do
     echo '      <div class="row">
-        <div class="name">'"${SCREENS[i]}"'</div>
+        <aside class="name">'"${SCREENS[i]}"'</div>
         <div class="value">'"${RESOLUTIONS[i]}"'</div>
       </div>'
   done
