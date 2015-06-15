@@ -7,6 +7,11 @@ if ! XRANDR=$(which xrandr 2>/dev/null); then
   exit 1
 fi
 
+if [[ ! -e /proc/cpuinfo ]]; then
+  echo 'error: /proc/cpuinfo not found' >&2
+  exit 1
+fi
+
 #if [[ $USER != root ]]; then
 #  gksu -m 'Password:' "$0"
 #  exit 0
@@ -16,6 +21,17 @@ if ! LSHW=$(which lshw 2>/dev/null); then
   echo 'error: lshw not found' >&2
   exit 1
 fi
+
+get_cpuinfo()
+{
+  local CPUINFO x
+  CPUINFO="$(cat /proc/cpuinfo)"
+  x="$(grep '^model name' <<< "$CPUINFO"|head -1)"
+  x="${x#*: }"
+  CPUMODEL="$(echo $x)"
+  x="$(grep '^cpu cores' <<< "$CPUINFO"|head -1)"
+  CPUCORES="${x##* }"
+}
 
 get_resolutions()
 {
@@ -253,7 +269,17 @@ generate_html()
   </head>
   <body>'
 
-  echo '    <section class="component">'
+  echo '    <section class="component">
+      <div class="row">
+        <aside class="name">CPU</aside>
+        <div class="value">'"$CPUMODEL"'</div>
+      </div>
+      <div class="row">
+        <aside class="name">Cores</aside>
+        <div class="value">'"$CPUCORES"'</div>
+      </div>
+    </section>
+    <section class="component">'
   for ((i = 0; i < ${#SCREENS[@]}; i++)); do
     echo '      <div class="row">
         <aside class="name">'"${SCREENS[i]}"'</aside>
@@ -266,6 +292,7 @@ generate_html()
 </html>'
 }
 
+get_cpuinfo
 get_resolutions
 generate_html
 
