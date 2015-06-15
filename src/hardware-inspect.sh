@@ -27,7 +27,7 @@ get_resolutions()
     l="${l%%+*}"
     RESOLUTIONS[i]="${l/x/ x }"
     ((i++))
-  done <<< "$($XRANDR|grep ' connected ')"
+  done <<< "$($XRANDR 2>/dev/null|grep ' connected ')"
 }
 
 parse_lshw()
@@ -210,4 +210,4 @@ for ((i = 0; i < ${#SCREENS[@]}; i++)); do
   echo "  ${SCREENS[i]}: ${RESOLUTIONS[i]}"
 done
 
-$LSHW -json|parse_lshw
+$LSHW -json 2>/dev/null|parse_lshw
