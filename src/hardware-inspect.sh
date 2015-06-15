@@ -7,10 +7,10 @@ if ! XRANDR=$(which xrandr 2>/dev/null); then
   exit 1
 fi
 
-if [[ $USER != root ]]; then
-  gksu -m 'Password:' "$0"
-  exit 0
-fi
+#if [[ $USER != root ]]; then
+#  gksu -m 'Password:' "$0"
+#  exit 0
+#fi
 
 if ! LSHW=$(which lshw 2>/dev/null); then
   echo 'error: lshw not found' >&2
@@ -203,11 +203,60 @@ parse_lshw()
   done
 }
 
-get_resolutions
-# temporary test print-out
-echo "${#SCREENS[@]} screen(s) detected:"
-for ((i = 0; i < ${#SCREENS[@]}; i++)); do
-  echo "  ${SCREENS[i]}: ${RESOLUTIONS[i]}"
-done
+generate_html()
+{
+  local i
 
-$LSHW -json 2>/dev/null|parse_lshw
+  echo '<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Hardware info</title>
+    <style>
+      .component {
+        border: 1px solid grey;
+        padding: 2px;
+        margin: 0px;
+        width: 105mm;
+      }
+      .row {
+      }
+      .name {
+        border: 0px solid;
+        font-family: "DejaVu Sans Mono", "Liberation Mono", Courier, monospace;
+        font-weight: bold;
+        text-align: right;
+        float: left;
+        width: 20mm;
+        background-color: lightgrey;
+        padding: 1px;
+      }
+      .value {
+        border: 0px solid;
+        font-family: "DejaVu Sans Mono", "Liberation Mono", Courier, monospace;
+        text-align: center;
+        width: auto;
+        padding: 1px;
+        margin: 1px;
+      }
+    </style>
+  </head>
+  <body>'
+
+  echo '    <div class="component">'
+  for ((i = 0; i < ${#SCREENS[@]}; i++)); do
+    echo '      <div class="row">
+        <div class="name">'"${SCREENS[i]}"'</div>
+        <div class="value">'"${RESOLUTIONS[i]}"'</div>
+      </div>'
+  done
+  echo '    </div>'
+
+  echo '  </body>
+</html>'
+}
+
+get_resolutions
+generate_html
+
+#$LSHW -json 2>/dev/null|parse_lshw
