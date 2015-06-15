@@ -2,6 +2,11 @@
 
 shopt -s extglob
 
+if ! XRANDR=$(which xrandr 2>/dev/null); then
+  echo 'error: xrandr not found' >&2
+  exit 1
+fi
+
 if [[ $USER != root ]]; then
   gksu -m 'Password:' "$0"
   exit 0
@@ -11,6 +16,19 @@ if ! LSHW=$(which lshw 2>/dev/null); then
   echo 'error: lshw not found' >&2
   exit 1
 fi
+
+get_resolutions()
+{
+  local l i
+  ((i=0))
+  while read l; do
+    SCREENS[i]="${l%% *}"
+    l="${l##*connected }"
+    l="${l%%+*}"
+    RESOLUTIONS[i]="${l/x/ x }"
+    ((i++))
+  done <<< "$($XRANDR|grep ' connected ')"
+}
 
 parse_lshw()
 {
@@ -184,5 +202,12 @@ parse_lshw()
     esac
   done
 }
+
+get_resolutions
+# temporary test print-out
+echo "${#SCREENS[@]} screen(s) detected:"
+for ((i = 0; i < ${#SCREENS[@]}; i++)); do
+  echo "  ${SCREENS[i]}: ${RESOLUTIONS[i]}"
+done
 
 $LSHW -json|parse_lshw
