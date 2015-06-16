@@ -35,15 +35,24 @@ get_cpuinfo()
 
 get_resolutions()
 {
-  local l i
+  local l i x y
   ((i=0))
   while read l; do
     SCREENS[i]="${l%% *}"
-    l="${l##*connected }"
-    l="${l%%+*}"
-    RESOLUTIONS[i]="${l/x/ x }"
+    if [[ "$l" == *disconnected* ]]; then
+      RESOLUTIONS[i]=''
+    else
+      l="${l##*connected }"
+      l="${l%%+*}"
+      x="${l%%x*}"
+      y="${l##*x}"
+      if (( y > x )); then
+        ((l=x)); ((x=y)); ((y=l))
+      fi
+      RESOLUTIONS[i]="${x}x$y"
+    fi
     ((i++))
-  done <<< "$($XRANDR 2>/dev/null|grep ' connected ')"
+  done <<< "$($XRANDR 2>/dev/null|grep 'connected '|grep -v '^VIRTUAL')"
 }
 
 parse_lshw()
@@ -325,16 +334,19 @@ generate_html()
         <div class="value">'"$CPUCORES"'-ydinsuoritin<p class="ital">'"$CPUMODEL"'</p></div>
       </div>
     </section>
-    <section class="component">'
+    <section class="component">
+      <div class="row">
+        <aside class="name">Kuva</aside>
+        <div class="value">'
   for ((i = 0; i < ${#SCREENS[@]}; i++)); do
-    echo '      <div class="row">
-        <aside class="name">'"${SCREENS[i]}"'</aside>
-        <div class="value">'"${RESOLUTIONS[i]}"'</div>
-      </div>'
+    ((i == 0)) || echo -n ', '
+    echo -n "${SCREENS[i]}"
+    [[ ! ${RESOLUTIONS[i]} ]] || echo -n " (${RESOLUTIONS[i]})"
   done
-  echo '    </section>'
-
-  echo '  </body>
+  echo '</div>
+      </div>
+    </section>
+  </body>
 </html>'
 }
 
