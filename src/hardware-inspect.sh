@@ -273,11 +273,7 @@ generate_html()
   echo '    <section class="component">
       <div class="row">
         <aside class="name">CPU</aside>
-        <div class="value">'"$CPUMODEL"'</div>
-      </div>
-      <div class="row">
-        <aside class="name">Cores</aside>
-        <div class="value">'"$CPUCORES"'</div>
+        <div class="value">'"$CPUCORES-ydinsuoritin<br>$CPUMODEL"'</div>
       </div>
     </section>
     <section class="component">'
