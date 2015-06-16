@@ -234,21 +234,29 @@ generate_html()
     <style>
       @font-face {
         font-family: OpenDyslexic;
-        src: url("file:/usr/share/fonts/opentype/opendyslexic/OpenDyslexic-Regular.otf") format("opentype");
+        src: url("file:/usr/share/fonts/opentype/opendyslexic/OpenDyslexic-Regular.otf") format("opentype"),
+             url("file:./OpenDyslexic-Regular.otf") format("opentype");
+        font-weight: normal;
+        font-style: normal;
       }
       @font-face {
         font-family: OpenDyslexic;
-        src: url("file:/usr/share/fonts/opentype/opendyslexic/OpenDyslexic-Bold.otf") format("opentype");
+        src: url("file:/usr/share/fonts/opentype/opendyslexic/OpenDyslexic-Bold.otf") format("opentype"),
+             url("file:./OpenDyslexic-Bold.otf") format("opentype");
         font-weight: bold;
+        font-style: normal;
       }
       @font-face {
         font-family: OpenDyslexic;
-        src: url("file:/usr/share/fonts/opentype/opendyslexic/OpenDyslexic-Italic.otf") format("opentype");
+        src: url("file:/usr/share/fonts/opentype/opendyslexic/OpenDyslexic-Italic.otf") format("opentype"),
+             url("file:./OpenDyslexic-Italic.otf") format("opentype");
+        font-weight: normal;
         font-style: italic;
       }
       @font-face {
         font-family: OpenDyslexic;
-        src: url("file:/usr/share/fonts/opentype/opendyslexic/OpenDyslexic-BoldItalic.otf") format("opentype");
+        src: url("file:/usr/share/fonts/opentype/opendyslexic/OpenDyslexic-BoldItalic.otf") format("opentype"),
+             url("file:./OpenDyslexic-BoldItalic.otf") format("opentype");
         font-weight: bold;
         font-style: italic;
       }
