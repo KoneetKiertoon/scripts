@@ -241,6 +241,17 @@ generate_html()
         src: url("file:/usr/share/fonts/opentype/opendyslexic/OpenDyslexic-Bold.otf") format("opentype");
         font-weight: bold;
       }
+      @font-face {
+        font-family: OpenDyslexic;
+        src: url("file:/usr/share/fonts/opentype/opendyslexic/OpenDyslexic-Italic.otf") format("opentype");
+        font-style: italic;
+      }
+      @font-face {
+        font-family: OpenDyslexic;
+        src: url("file:/usr/share/fonts/opentype/opendyslexic/OpenDyslexic-BoldItalic.otf") format("opentype");
+        font-weight: bold;
+        font-style: italic;
+      }
       .component {
         display: block;
         overflow: hidden;
