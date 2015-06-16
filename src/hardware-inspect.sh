@@ -286,6 +286,14 @@ generate_html()
         margin: 0.2mm;
         margin-left: '"$NAME_WIDTH_MM"'mm;
       }
+      p.ital {
+        font-family: '"$FONT"';
+        font-style: italic;
+        text-align: center;
+        border: 0mm solid;
+        padding: 0mm;
+        margin: 0mm;
+      }
     </style>
   </head>
   <body>'
@@ -293,7 +301,7 @@ generate_html()
   echo '    <section class="component">
       <div class="row">
         <aside class="name">CPU</aside>
-        <div class="value">'"$CPUCORES-ydinsuoritin<br>$CPUMODEL"'</div>
+        <div class="value">'"$CPUCORES"'-ydinsuoritin<p class="ital">'"$CPUMODEL"'</p></div>
       </div>
     </section>
     <section class="component">'
