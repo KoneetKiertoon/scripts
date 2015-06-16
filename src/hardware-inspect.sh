@@ -224,7 +224,7 @@ generate_html()
   local i WIDTH_MM NAME_WIDTH_MM FONT
   ((WIDTH_MM=105))
   ((NAME_WIDTH_MM=20))
-  FONT='"DejaVu Sans Mono", "Liberation Mono", Courier, monospace'
+  FONT='"OpenDyslexic"'
 
   echo '<!DOCTYPE html>
 <html>
@@ -232,6 +232,15 @@ generate_html()
     <meta charset="UTF-8">
     <title>Hardware info</title>
     <style>
+      @font-face {
+        font-family: OpenDyslexic;
+        src: url("file:/usr/share/fonts/opentype/opendyslexic/OpenDyslexic-Regular.otf") format("opentype");
+      }
+      @font-face {
+        font-family: OpenDyslexic;
+        src: url("file:/usr/share/fonts/opentype/opendyslexic/OpenDyslexic-Bold.otf") format("opentype");
+        font-weight: bold;
+      }
       .component {
         display: block;
         overflow: hidden;
