@@ -221,9 +221,10 @@ parse_lshw()
 
 generate_html()
 {
-  local i WIDTH_MM NAME_WIDTH_MM
+  local i WIDTH_MM NAME_WIDTH_MM FONT
   ((WIDTH_MM=105))
   ((NAME_WIDTH_MM=20))
+  FONT='"DejaVu Sans Mono", "Liberation Mono", Courier, monospace'
 
   echo '<!DOCTYPE html>
 <html>
@@ -247,7 +248,7 @@ generate_html()
       }
       .name {
         border: 0mm solid;
-        font-family: "DejaVu Sans Mono", "Liberation Mono", Courier, monospace;
+        font-family: '"$FONT"';
         font-weight: bold;
         text-align: center;
         float: left;
@@ -258,7 +259,7 @@ generate_html()
       }
       .value {
         border: 0mm solid;
-        font-family: "DejaVu Sans Mono", "Liberation Mono", Courier, monospace;
+        font-family: '"$FONT"';
         text-align: center;
         background-color: #ffffff;
         padding: 0.2mm;
