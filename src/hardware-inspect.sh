@@ -284,6 +284,8 @@ generate_html()
         background-color: #d8d8d8;
         margin: 0.2mm;
         padding: 0.2mm;
+        /*-webkit-animation: horrible 1s infinite;
+        animation: horrible 1s infinite;*/
       }
       .value {
         border: 0mm solid;
@@ -302,6 +304,12 @@ generate_html()
         padding: 0mm;
         margin: 0mm;
       }
+      /*@-webkit-keyframes horrible {
+        50% {font-size: 14px;}
+      }
+      @keyframes horrible {
+        50% {font-size: 14px;}
+      }*/
     </style>
   </head>
   <body>'
