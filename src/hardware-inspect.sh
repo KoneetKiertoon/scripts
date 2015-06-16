@@ -221,9 +221,11 @@ parse_lshw()
 
 generate_html()
 {
-  local i WIDTH_MM NAME_WIDTH_MM FONT
+  local i WIDTH_MM NAME_WIDTH_MM FONT FONT_SIZE_MM FONT_SIZE_SMALL_MM
   ((WIDTH_MM=105))
   ((NAME_WIDTH_MM=20))
+  FONT_SIZE_MM='5'
+  FONT_SIZE_SMALL_MM='3.5'
   FONT='"OpenDyslexic"'
 
   echo '<!DOCTYPE html>
@@ -277,6 +279,7 @@ generate_html()
       .name {
         border: 0mm solid;
         font-family: '"$FONT"';
+        font-size: '"$FONT_SIZE_MM"'mm;
         font-weight: bold;
         text-align: center;
         float: left;
@@ -290,6 +293,7 @@ generate_html()
       .value {
         border: 0mm solid;
         font-family: '"$FONT"';
+        font-size: '"$FONT_SIZE_MM"'mm;
         text-align: center;
         background-color: #ffffff;
         padding: 0.2mm;
@@ -299,16 +303,17 @@ generate_html()
       p.ital {
         font-family: '"$FONT"';
         font-style: italic;
+        font-size: '"$FONT_SIZE_SMALL_MM"'mm;
         text-align: center;
         border: 0mm solid;
         padding: 0mm;
         margin: 0mm;
       }
       /*@-webkit-keyframes horrible {
-        50% {font-size: 14px;}
+        50% {font-size: '"$FONT_SIZE_SMALL_MM"'mm;}
       }
       @keyframes horrible {
-        50% {font-size: 14px;}
+        50% {font-size: '"$FONT_SIZE_SMALL_MM"'mm;}
       }*/
     </style>
   </head>
