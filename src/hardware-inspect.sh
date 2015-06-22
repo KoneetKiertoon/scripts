@@ -17,10 +17,15 @@ fi
 #  exit 0
 #fi
 
-#if ! LSHW=$(which lshw 2>/dev/null); then
-#  echo 'error: lshw not found' >&2
-#  exit 1
-#fi
+if ! LSHW=$(which lshw 2>/dev/null); then
+  echo 'error: lshw not found' >&2
+  exit 1
+fi
+
+if ! JSHON=$(which jshon 2>/dev/null); then
+  echo 'error: jshon not found' >&2
+  exit 1
+fi
 
 get_cpuinfo()
 {
@@ -177,6 +182,102 @@ generate_html()
 </html>'
 }
 
+json_array()
+{
+  local JSON DEPTH LEN NUM TYPE i
+
+  JSON="$1"
+  DEPTH="$2"
+  LEN="$("$JSHON" -l <<< "$JSON")"
+
+  for ((NUM=0; NUM<LEN; NUM++)); do
+    TYPE="$("$JSHON" -e $((NUM)) -t <<< "$JSON")"
+    case "$TYPE" in
+    'array')
+      for ((i=0; i<DEPTH; i++)); do
+        echo -n ' '
+      done
+      echo "["
+      json_array "$("$JSHON" -e $((NUM)) <<< "$JSON")" $((DEPTH+1))
+      for ((i=0; i<DEPTH; i++)); do
+        echo -n ' '
+      done
+      echo ']'
+      ;;
+    'object')
+      for ((i=0; i<DEPTH; i++)); do
+        echo -n ' '
+      done
+      echo "{"
+      json_object "$("$JSHON" -e $((NUM)) <<< "$JSON")" $((DEPTH+1))
+      for ((i=0; i<DEPTH; i++)); do
+        echo -n ' '
+      done
+      echo '}'
+      ;;
+    esac
+  done
+}
+
+json_object()
+{
+  local JSON DEPTH KEYS KEY TYPE i
+
+  JSON="$1"
+  DEPTH="$2"
+  KEYS="$("$JSHON" -k <<< "$JSON")"
+
+  for KEY in $KEYS; do
+    TYPE="$("$JSHON" -e "$KEY" -t <<< "$JSON")"
+    case "$TYPE" in
+    'array')
+      for ((i=0; i<DEPTH; i++)); do
+        echo -n ' '
+      done
+      echo "$KEY : ["
+      json_array "$("$JSHON" -e "$KEY" <<< "$JSON")" $((DEPTH+1))
+      for ((i=0; i<DEPTH; i++)); do
+        echo -n ' '
+      done
+      echo ']'
+      ;;
+    'object')
+      for ((i=0; i<DEPTH; i++)); do
+        echo -n ' '
+      done
+      echo "$KEY : {"
+      json_object "$("$JSHON" -e "$KEY" <<< "$JSON")" $((DEPTH+1))
+      for ((i=0; i<DEPTH; i++)); do
+        echo -n ' '
+      done
+      echo '}'
+      ;;
+    'string')
+      for ((i=0; i<DEPTH; i++)); do
+        echo -n ' '
+      done
+      echo "$KEY : $("$JSHON" -e "$KEY" -u <<< "$JSON")"
+      ;;
+    esac
+  done
+}
+
+parse_lshw()
+{
+  local JSON
+
+  JSON="$("$LSHW" -json 2>/dev/null)"
+
+  if [[ $("$JSHON" -t <<< "$JSON") != 'object' ||
+        $("$JSHON" -e class -u <<< "$JSON") != 'system' ]]; then
+    echo 'Got invalid JSON output from lshw' >&2
+    return 1
+  fi
+
+  json_object "$JSON"
+}
+
+#parse_lshw
 get_cpuinfo
 get_resolutions
 generate_html
