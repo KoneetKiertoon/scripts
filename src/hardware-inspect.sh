@@ -12,6 +12,11 @@ if [[ ! -e /proc/cpuinfo ]]; then
   exit 1
 fi
 
+if ! DMIDECODE=$(which dmidecode 2>/dev/null); then
+  echo 'error: dmidecode not found' >&2
+  exit 1
+fi
+
 #if [[ $USER != root ]]; then
 #  gksu -m 'Password:' "$0"
 #  exit 0
@@ -36,6 +41,58 @@ get_cpuinfo()
   CPUMODEL="$(echo $x)"
   x="$(grep '^cpu cores' <<< "$CPUINFO"|head -1)"
   CPUCORES="${x##* }"
+}
+
+get_meminfo()
+{
+  local l x i m n
+  ((x=0))
+  ((i=0))
+  while read l; do
+    if (( x == 2 )); then
+      case "$l" in
+      'Maximum Capacity:'*)
+        MEM_MAX[i]="${l#*: }"
+        ;;
+      'Number Of Devices:'*)
+        MEM_NUM[i]="${l#*: }"
+        ;;
+      'Physical Memory Array')
+        ((i++))
+        ((x=1))
+        m=
+        n=
+        ;;
+      esac
+    elif (( x == 1 )); then
+      case "$l" in
+      'Maximum Capacity:'*)
+        m="${l#*: }"
+        ;;
+      'Number Of Devices:'*)
+        n="${l#*: }"
+        ;;
+      'Use: System Memory')
+        ((x=2))
+        if [[ $m ]]; then
+          MEM_MAX[i]="$m"
+          m=
+        fi
+        if [[ $n ]]; then
+          MEM_NUM[i]="$n"
+          n=
+        fi
+        ;;
+      esac
+    elif [[ "$l" == 'Physical Memory Array' ]]; then
+      ((x=1))
+    fi
+  done <<< "$($DMIDECODE -t 16 2>/dev/null|egrep -o '[^ \t].*[^ \t]')"
+
+  # temporary testing output
+  for ((i=0; i<${#MEM_MAX[@]}; i++)); do
+    echo "$i : slots: ${MEM_NUM[i]}, max: ${MEM_MAX[i]}"
+  done
 }
 
 get_resolutions()
@@ -277,6 +334,7 @@ parse_lshw()
   json_object "$JSON"
 }
 
+#get_meminfo
 #parse_lshw
 get_cpuinfo
 get_resolutions
