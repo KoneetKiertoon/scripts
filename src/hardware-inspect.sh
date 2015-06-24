@@ -87,7 +87,7 @@ get_meminfo()
     elif [[ "$l" == 'Physical Memory Array' ]]; then
       ((x=1))
     fi
-  done <<< "$($DMIDECODE -t 16 2>/dev/null|egrep -o '[^ \t].*[^ \t]')"
+  done <<< "$($DMIDECODE -t 16 2>/dev/null|egrep -o '[^[:cntrl:]]+')"
 
   # temporary testing output
   for ((i=0; i<${#MEM_MAX[@]}; i++)); do
