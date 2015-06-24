@@ -45,7 +45,8 @@ get_cpuinfo()
 
 get_meminfo()
 {
-  local l x i m n
+  local l x i m n t
+
   ((x=0))
   ((i=0))
   while read l; do
@@ -92,6 +93,91 @@ get_meminfo()
   # temporary testing output
   for ((i=0; i<${#MEM_MAX[@]}; i++)); do
     echo "$i : slots: ${MEM_NUM[i]}, max: ${MEM_MAX[i]}"
+  done
+
+  ((x=0))
+  ((i=0))
+  while read l; do
+    if (( x == 2 )); then
+      case "$l" in
+      'Size:'*)
+        m="${l#*Size: }"
+        if [[ "$m" == No* ]]; then
+          MEM_BANK_SIZE[i]='0'
+        else
+          MEM_BANK_SIZE[i]="$m"
+        fi
+        ;;
+      'Speed:'*)
+        n="${l#*Speed: }"
+        if [[ "$n" == Un* ]]; then
+          MEM_BANK_SPEED[i]=''
+        else
+          MEM_BANK_SPEED[i]="$n"
+        fi
+        ;;
+      'Type:'*)
+        t="${l#*Type: }"
+        if [[ "$t" == Un* ]]; then
+          MEM_BANK_TYPE[i]=''
+        else
+          MEM_BANK_TYPE[i]="$t"
+        fi
+        ;;
+      'Memory Device')
+        ((i++))
+        ((x=1))
+        m=
+        n=
+        t=
+        ;;
+      esac
+    elif (( x == 1 )); then
+      case "$l" in
+      'Size:'*)
+        m="${l#*Size: }"
+        if [[ "$m" == No* ]]; then
+          m='0'
+        fi
+        ;;
+      'Speed:'*)
+        n="${l#*Speed: }"
+        if [[ "$n" == Un* ]]; then
+          n=''
+        fi
+        ;;
+      'Type:'*)
+        t="${l#*Type: }"
+        ;;
+      'Form Factor: '*'DIMM')
+        ((x=2))
+        MEM_BANK_FORM[i]="${l#*Form Factor: }"
+        if [[ $t ]]; then
+          MEM_BANK_TYPE[i]="$t"
+          t=
+        else
+          MEM_BANK_TYPE[i]=''
+        fi
+        if [[ $m ]]; then
+          MEM_BANK_SIZE[i]="$m"
+          m=
+        fi
+        if [[ $n ]]; then
+          MEM_BANK_SPEED[i]="$n"
+          n=
+        else
+          MEM_BANK_SPEED[i]=''
+        fi
+        ;;
+      esac
+    elif [[ "$l" == 'Memory Device' ]]; then
+      ((x=1))
+    fi
+  done <<< "$($DMIDECODE -t 17 2>/dev/null|egrep -o '[^[:cntrl:]]+')"
+
+  # temporary testing output
+  for ((i=0; i<${#MEM_BANK_FORM[@]}; i++)); do
+    echo "bank $i: ${MEM_BANK_FORM[i]} ${MEM_BANK_SIZE[i]} ${MEM_BANK_TYPE[i]} ${MEM_BANK_SPEED[i]}"
   done
 }
 
