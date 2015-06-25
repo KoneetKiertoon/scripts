@@ -91,9 +91,9 @@ get_meminfo()
   done <<< "$($DMIDECODE -t 16 2>/dev/null|egrep -o '[^[:cntrl:]]+')"
 
   # temporary testing output
-  for ((i=0; i<${#MEM_MAX[@]}; i++)); do
-    echo "$i : slots: ${MEM_NUM[i]}, max: ${MEM_MAX[i]}"
-  done
+#  for ((i=0; i<${#MEM_MAX[@]}; i++)); do
+#    echo "$i : slots: ${MEM_NUM[i]}, max: ${MEM_MAX[i]}"
+#  done
 
   ((x=0))
   ((i=0))
@@ -175,9 +175,15 @@ get_meminfo()
     fi
   done <<< "$($DMIDECODE -t 17 2>/dev/null|egrep -o '[^[:cntrl:]]+')"
 
-  # temporary testing output
+  ((MEM_TOTAL=0))
   for ((i=0; i<${#MEM_BANK_FORM[@]}; i++)); do
-    echo "bank $i: ${MEM_BANK_FORM[i]} ${MEM_BANK_SIZE[i]} ${MEM_BANK_TYPE[i]} ${MEM_BANK_SPEED[i]}"
+    m="$(egrep -o '[0-9]+' <<< "${MEM_BANK_SIZE[i]}")"
+    if [[ ${MEM_BANK_SIZE[i]} == *GB ]]; then
+      (( m *= 1024 ))
+    elif [[ ${MEM_BANK_SIZE[i]} != *MB ]]; then
+      (( m = 0 ))
+    fi
+    (( MEM_TOTAL += m ))
   done
 }
 
@@ -205,10 +211,11 @@ get_resolutions()
 
 generate_html()
 {
-  local i WIDTH_MM NAME_WIDTH_MM FONT FONT_SIZE_MM FONT_SIZE_SMALL_MM
+  local i WIDTH_MM NAME_WIDTH_MM FONT FONT_SIZE_MM FONT_SIZE_SMALLISH_MM FONT_SIZE_SMALL_MM
   ((WIDTH_MM=105))
   ((NAME_WIDTH_MM=20))
   FONT_SIZE_MM='5'
+  FONT_SIZE_SMALLISH_MM='4'
   FONT_SIZE_SMALL_MM='3.5'
   FONT='"OpenDyslexic"'
 
@@ -293,6 +300,15 @@ generate_html()
         padding: 0mm;
         margin: 0mm;
       }
+      ol.ital {
+        font-family: '"$FONT"';
+        font-style: italic;
+        font-size: '"$FONT_SIZE_SMALLISH_MM"'mm;
+        text-align: left;
+        border: 0mm solid;
+        padding: 0mm;
+        margin: 0mm;
+      }
       /*@-webkit-keyframes horrible {
         50% {font-size: '"$FONT_SIZE_SMALL_MM"'mm;}
       }
@@ -301,12 +317,24 @@ generate_html()
       }*/
     </style>
   </head>
-  <body>'
-
-  echo '    <section class="component">
+  <body>
+    <section class="component">
       <div class="row">
         <aside class="name">CPU</aside>
         <div class="value">'"$CPUCORES"'-ydinsuoritin<p class="ital">'"$CPUMODEL"'</p></div>
+      </div>
+    </section>
+    <section class="component">
+      <div class="row">
+        <aside class="name">Muisti</aside>
+        <div class="value">
+          Kokonaism&auml;&auml;r&auml;: '"$MEM_TOTAL"' MiB
+          <ol class="ital">'
+  for ((i = 0; i < ${#MEM_BANK_FORM[@]}; i++)); do
+    echo "            <li>${MEM_BANK_TYPE[i]} ${MEM_BANK_SPEED[i]} ${MEM_BANK_SIZE[i]}</li>"
+  done
+  echo '          </ol>
+        </div>
       </div>
     </section>
     <section class="component">
@@ -420,7 +448,7 @@ parse_lshw()
   json_object "$JSON"
 }
 
-#get_meminfo
+get_meminfo
 #parse_lshw
 get_cpuinfo
 get_resolutions
