@@ -263,17 +263,18 @@ generate_html()
         background-color: #000000;
       }
       .row {
+        display: table;
         padding: 0.2mm;
         margin: 0.2mm;
         background-color: #ffffff;
       }
       .name {
+        display: table-cell;
         border: 0mm solid;
         font-family: '"$FONT"';
         font-size: '"$FONT_SIZE_MM"'mm;
         font-weight: bold;
         text-align: center;
-        float: left;
         width: '"$NAME_WIDTH_MM"'mm;
         background-color: #d8d8d8;
         margin: 0.2mm;
@@ -282,6 +283,7 @@ generate_html()
         animation: horrible 1s infinite;*/
       }
       .value {
+        display: table-cell;
         border: 0mm solid;
         font-family: '"$FONT"';
         font-size: '"$FONT_SIZE_MM"'mm;
@@ -290,6 +292,7 @@ generate_html()
         padding: 0.2mm;
         margin: 0.2mm;
         margin-left: '"$NAME_WIDTH_MM"'mm;
+        width: '"$((WIDTH_MM-NAME_WIDTH_MM))"'mm;
       }
       p.ital {
         font-family: '"$FONT"';
@@ -306,7 +309,6 @@ generate_html()
         font-size: '"$FONT_SIZE_SMALLISH_MM"'mm;
         text-align: left;
         border: 0mm solid;
-        padding: 0mm;
         margin: 0mm;
       }
       /*@-webkit-keyframes horrible {
