@@ -333,7 +333,13 @@ generate_html()
           Kokonaism&auml;&auml;r&auml;: '"$MEM_TOTAL"' MiB
           <ol class="ital">'
   for ((i = 0; i < ${#MEM_BANK_FORM[@]}; i++)); do
-    echo "            <li>${MEM_BANK_TYPE[i]} ${MEM_BANK_SPEED[i]} ${MEM_BANK_SIZE[i]}</li>"
+    echo -n "            <li>${MEM_BANK_TYPE[i]} "
+    if [[ "${MEM_BANK_SIZE[i]}" == '0' ]]; then
+      echo -n '&lt;tyhj&auml;&gt;'
+    else
+      echo -n "${MEM_BANK_SPEED[i]} ${MEM_BANK_SIZE[i]}"
+    fi
+    echo '</li>'
   done
   echo '          </ol>
         </div>
