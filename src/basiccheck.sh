@@ -16,7 +16,20 @@ do
 
   unset RUNNAME RUNDESC runfile_exec
 
-  . "$F" || continue
+  . "$F"
+
+  RETVAL=$?
+  DATE=$(/bin/date --rfc-3339=ns)
+
+  if (( RETVAL != 0 ))
+  then
+    echo "$DATE Failed to source ${F}" >> "$LOGFILE"
+    continue
+  elif [[ $(type -t runfile_exec) != function ]]
+  then
+    echo "$DATE No runfile_exec() definition found in ${F}" >> "$LOGFILE"
+    continue
+  fi
 
   if [[ $RUNNAME ]]
   then
