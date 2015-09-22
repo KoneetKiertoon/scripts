@@ -1,6 +1,23 @@
 #!/bin/bash
 
-unset DOT_D_PATH LOGFILE RUNFILES RUNVALS RUNMSGS
+acquire_root()
+{
+  if ! sudo -v
+  then
+    return 1
+  fi
+
+  while true
+  do
+    sudo -n true
+    sleep 15
+    kill -0 "$$" || exit
+  done 2>/dev/null &
+
+  return 0
+}
+
+unset DOT_D_PATH LOGFILE RUNFILES RUNVALS RUNMSGS SUDO_KEPT_ALIVE
 
 # TODO: this path is temporary, will eventually
 # become something like /usr/lib/basiccheck.d
@@ -14,7 +31,7 @@ do
   F="${RUNFILES[i]}"
   [[ -f "$F" ]] || continue
 
-  unset RUNNAME RUNDESC runfile_exec
+  unset RUNNAME RUNDESC runfile_exec RUNASROOT
 
   . "$F"
 
@@ -50,6 +67,19 @@ do
   1) echo "$DATE Skipping $F" >> "$LOGFILE" ; continue ;;
   255) echo "$DATE ESC pressed, exiting" >> "$LOGFILE" ; exit 255 ;;
   esac
+
+  if [[ -n $RUNASROOT && -z $SUDO_KEPT_ALIVE ]]
+  then
+    DATE=$(/bin/date --rfc-3339=ns)
+    echo "$DATE Trying to to acquire root" >> "$LOGFILE"
+    if ! acquire_root
+    then
+      DATE=$(/bin/date --rfc-3339=ns)
+      echo "$DATE Failed to acquire root, skipping $F" >> "$LOGFILE"
+      continue
+    fi
+    SUDO_KEPT_ALIVE=1
+  fi
 
   RUNMSGS[i]="$(runfile_exec)"
   RUNVALS[i]=$?
