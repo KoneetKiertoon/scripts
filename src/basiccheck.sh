@@ -14,20 +14,20 @@ do
   F="${RUNFILES[i]}"
   [[ -f "$F" ]] || continue
 
-  unset RUNNAME RUNDESC runfile_init runfile_exec runfile_fini
+  unset RUNNAME RUNDESC runfile_exec
 
   . "$F" || continue
 
   if [[ $RUNNAME ]]
   then
-    QUERY="Run test \"$RUNNAME\"?"
+    MSG="Run test \"$RUNNAME\"?"
   else
-    QUERY="Run test ${F##*/}?"
+    MSG="Run test ${F##*/}?"
   fi
 
-  /usr/bin/dialog --title 'koneetkiertoon.fi basic check' \
+  /usr/bin/dialog --title 'Next command - koneetkiertoon.fi basic check' \
                   --backtitle '[Press ESC to exit]' \
-                  --yesno "$QUERY" 0 0
+                  --yesno "$MSG" 0 0
 
   RETVAL=$?
   DATE=$(/bin/date --rfc-3339=ns)
@@ -41,6 +41,29 @@ do
   RUNMSGS[i]="$(runfile_exec)"
   RUNVALS[i]=$?
 
+  # write script results to log file
   DATE=$(/bin/date --rfc-3339=ns)
   echo "$DATE RUNMSGS[$i]=\"${RUNMSGS[i]}\""$'\n'"$DATE RUNVALS[$i]=${RUNVALS[i]}" >> "$LOGFILE"
+
+  # display script results
+  case ${RUNVALS[i]} in
+  0) MSG='Command completed successfully.' ;;
+  *) MSG="Command failed with return value ${RUNVALS[i]}" ;;
+  esac
+
+  if [[ -n ${RUNMSGS[i]} ]]
+  then
+    MSG="$MSG"$'\n'"Command output was:"$'\n\n'"${RUNMSGS[i]}"
+  fi
+
+  /usr/bin/dialog --title 'Command results - koneetkiertoon.fi basic check' \
+                  --backtitle '[Press ESC to exit]' \
+                  --msgbox "$MSG" 0 0
+
+  RETVAL=$?
+  DATE=$(/bin/date --rfc-3339=ns)
+
+  case $RETVAL in
+  255) echo "$DATE ESC pressed, exiting" >> "$LOGFILE" ; exit 255 ;;
+  esac
 done
