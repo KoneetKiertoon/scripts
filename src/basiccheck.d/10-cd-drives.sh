@@ -1,4 +1,4 @@
-RUNNAME="freegeek_show_cd_drives"
+RUNNAME="CD/DVD drives"
 
 runfile_exec()
 {

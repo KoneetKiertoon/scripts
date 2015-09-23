@@ -1,4 +1,4 @@
-RUNNAME="ping test"
+RUNNAME="Network"
 
 runfile_exec()
 {

@@ -1,4 +1,4 @@
-RUNNAME="speaker-test"
+RUNNAME="Speakers"
 
 runfile_exec()
 {

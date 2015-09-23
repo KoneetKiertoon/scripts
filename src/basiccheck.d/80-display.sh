@@ -1,4 +1,4 @@
-RUNNAME="displays"
+RUNNAME="Displays"
 
 runfile_exec()
 {

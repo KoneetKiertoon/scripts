@@ -1,4 +1,4 @@
-RUNNAME="video-card"
+RUNNAME="Video card"
 
 runfile_exec()
 {

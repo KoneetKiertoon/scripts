@@ -1,4 +1,4 @@
-RUNNAME="CPU info"
+RUNNAME="CPU"
 
 runfile_exec()
 {

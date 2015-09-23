@@ -1,4 +1,4 @@
-RUNNAME="memory size"
+RUNNAME="RAM"
 RUNASROOT=1
 
 runfile_exec()

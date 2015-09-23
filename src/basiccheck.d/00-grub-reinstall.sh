@@ -1,4 +1,4 @@
-RUNNAME="GRUB reinstall"
+RUNNAME="GRUB"
 RUNASROOT=1
 
 runfile_exec()
