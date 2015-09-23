@@ -20,9 +20,7 @@ acquire_root()
 unset DOT_D_PATH LOGFILE RUNFILES RUNNAMES RUNVALS RUNMSGS SUDO_KEPT_ALIVE \
       SUMMARY
 
-# TODO: this path is temporary, will eventually
-# become something like /usr/lib/basiccheck.d
-DOT_D_PATH=/git/koneetkiertoon-scripts/src/basiccheck.d
+DOT_D_PATH=/usr/lib/basiccheck.d
 LOGFILE=/dev/shm/basiccheck.log
 
 RUNFILES=("${DOT_D_PATH}"/*.sh)
