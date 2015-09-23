@@ -17,7 +17,8 @@ acquire_root()
   return 0
 }
 
-unset DOT_D_PATH LOGFILE RUNFILES RUNVALS RUNMSGS SUDO_KEPT_ALIVE
+unset DOT_D_PATH LOGFILE RUNFILES RUNNAMES RUNVALS RUNMSGS SUDO_KEPT_ALIVE \
+      SUMMARY
 
 # TODO: this path is temporary, will eventually
 # become something like /usr/lib/basiccheck.d
@@ -50,10 +51,12 @@ do
 
   if [[ $RUNNAME ]]
   then
-    MSG="Run test \"$RUNNAME\"?"
+    RUNNAMES[i]="$RUNNAME"
   else
-    MSG="Run test ${F##*/}?"
+    RUNNAMES[i]="${F##*/}"
   fi
+
+  MSG="Run test \"${RUNNAMES[i]}\"?"
 
   /usr/bin/dialog --title 'Next command - koneetkiertoon.fi basic check' \
                   --backtitle '[Press ESC to exit]' \
@@ -88,6 +91,10 @@ do
   DATE=$(/bin/date --rfc-3339=seconds)
   echo "$DATE RUNMSGS[$i]=\"${RUNMSGS[i]}\""$'\n'"$DATE RUNVALS[$i]=${RUNVALS[i]}" >> "$LOGFILE"
 
+  # append results to summary
+  (( i == 0 )) || SUMMARY="$SUMMARY"$'\n\n'
+  SUMMARY="$SUMMARY${RUNNAMES[i]}"$'\n'"$(sed 's|.|=|g' <<< "${RUNNAMES[i]}")"$'\n'"${RUNMSGS[i]}"
+
   # display script results
   case ${RUNVALS[i]} in
   0) MSG='Command completed successfully.' ;;
@@ -110,3 +117,7 @@ do
   255) echo "$DATE ESC pressed, exiting" >> "$LOGFILE" ; exit 255 ;;
   esac
 done
+
+clear
+
+echo "$SUMMARY"
