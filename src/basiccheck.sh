@@ -36,7 +36,7 @@ do
   . "$F"
 
   RETVAL=$?
-  DATE=$(/bin/date --rfc-3339=ns)
+  DATE=$(/bin/date --rfc-3339=seconds)
 
   if (( RETVAL != 0 ))
   then
@@ -60,7 +60,7 @@ do
                   --yesno "$MSG" 0 0
 
   RETVAL=$?
-  DATE=$(/bin/date --rfc-3339=ns)
+  DATE=$(/bin/date --rfc-3339=seconds)
 
   case $RETVAL in
   0) echo "$DATE Running $F" >> "$LOGFILE" ;;
@@ -70,11 +70,11 @@ do
 
   if [[ -n $RUNASROOT && -z $SUDO_KEPT_ALIVE ]]
   then
-    DATE=$(/bin/date --rfc-3339=ns)
+    DATE=$(/bin/date --rfc-3339=seconds)
     echo "$DATE Trying to to acquire root" >> "$LOGFILE"
     if ! acquire_root
     then
-      DATE=$(/bin/date --rfc-3339=ns)
+      DATE=$(/bin/date --rfc-3339=seconds)
       echo "$DATE Failed to acquire root, skipping $F" >> "$LOGFILE"
       continue
     fi
@@ -85,7 +85,7 @@ do
   RUNVALS[i]=$?
 
   # write script results to log file
-  DATE=$(/bin/date --rfc-3339=ns)
+  DATE=$(/bin/date --rfc-3339=seconds)
   echo "$DATE RUNMSGS[$i]=\"${RUNMSGS[i]}\""$'\n'"$DATE RUNVALS[$i]=${RUNVALS[i]}" >> "$LOGFILE"
 
   # display script results
@@ -104,7 +104,7 @@ do
                   --msgbox "$MSG" 0 0
 
   RETVAL=$?
-  DATE=$(/bin/date --rfc-3339=ns)
+  DATE=$(/bin/date --rfc-3339=seconds)
 
   case $RETVAL in
   255) echo "$DATE ESC pressed, exiting" >> "$LOGFILE" ; exit 255 ;;
