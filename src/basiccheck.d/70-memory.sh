@@ -161,16 +161,16 @@ runfile_exec()
     (( MEM_TOTAL += m ))
   done
 
-  echo 'Muistin kokonaismäärä: '"$MEM_TOTAL"' MiB'
+  echo 'Total RAM: '"$MEM_TOTAL"' MiB'
 
-  for ((i = 0; i < ${#MEM_BANK_FORM[@]}; i++))
+  for ((i = 0; i < ${#BANK_FORM[@]}; i++))
   do
-    echo -n "${MEM_BANK_TYPE[i]} "
-    if [[ "${MEM_BANK_SIZE[i]}" == '0' ]]
+    echo -n "Bank $i: ${BANK_TYPE[i]} "
+    if [[ "${BANK_SIZE[i]}" == '0' ]]
     then
-      echo '<tyhjä>'
+      echo '<empty>'
     else
-      echo "${MEM_BANK_SPEED[i]} ${MEM_BANK_SIZE[i]}"
+      echo "${BANK_SPEED[i]} ${BANK_SIZE[i]}"
     fi
   done
 
