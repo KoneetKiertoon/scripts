@@ -26,9 +26,9 @@ runfile_exec()
   done <<< "$(/usr/bin/xrandr 2>/dev/null|grep 'connected '|grep -v '^VIRTUAL')"
 
   for ((i = 0; i < ${#SCREENS[@]}; i++)); do
-    ((i == 0)) || echo -n ', '
-    echo -n "${SCREENS[i]}"
-    [[ ! ${RESOLUTIONS[i]} ]] || echo -n " (${RESOLUTIONS[i]})"
+    ((i == 0)) || RUNOUT="$RUNOUT, "
+    RUNOUT="$RUNOUT${SCREENS[i]}"
+    [[ ! ${RESOLUTIONS[i]} ]] || RUNOUT="$RUNOUT (${RESOLUTIONS[i]})"
   done
 
   return 0

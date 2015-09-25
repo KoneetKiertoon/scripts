@@ -161,16 +161,16 @@ runfile_exec()
     (( MEM_TOTAL += m ))
   done
 
-  echo 'Total RAM: '"$MEM_TOTAL"' MiB'
+  RUNOUT="Total RAM: $MEM_TOTAL MiB"
 
   for ((i = 0; i < ${#BANK_FORM[@]}; i++))
   do
-    echo -n "Bank $i: ${BANK_TYPE[i]} "
+    RUNOUT="$RUNOUT"$'\n'"Bank $i: ${BANK_TYPE[i]} "
     if [[ "${BANK_SIZE[i]}" == '0' ]]
     then
-      echo '<empty>'
+      RUNOUT="$RUNOUT<empty>"
     else
-      echo "${BANK_SPEED[i]} ${BANK_SIZE[i]}"
+      RUNOUT="$RUNOUT${BANK_SPEED[i]} ${BANK_SIZE[i]}"
     fi
   done
 

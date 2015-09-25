@@ -2,13 +2,15 @@ RUNNAME="CD/DVD drives"
 
 runfile_exec()
 {
-  local MSG RET
-  MSG="$(/usr/lib/freegeek/show_cd_drives 2>&1)"
+  local RET
+
+  RUNOUT="$(/usr/lib/freegeek/show_cd_drives 2>&1)"
   RET=$?
-  if (( RET == 0 )) && ! egrep -q '[^[:space:]]' <<< "$MSG"
+
+  if (( RET == 0 )) && ! egrep -q '[^[:space:]]' <<< "$RUNOUT"
   then
-    MSG='No CD drives found.'
+    RUNOUT='No CD drives found.'
   fi
-  echo "$MSG"
+
   return $RET
 }

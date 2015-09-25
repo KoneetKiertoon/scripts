@@ -18,11 +18,11 @@ acquire_root()
 }
 
 unset DOT_D_PATH LOGFILE RUNFILES RUNNAMES RUNVALS RUNMSGS SUDO_KEPT_ALIVE \
-      SUMMARY
+      SUMMARY KKNAME KKID BACKTITLE
 
+BACKTITLE='[Press ESC to exit]'
 DOT_D_PATH=/usr/lib/basiccheck.d
 LOGFILE=/dev/shm/basiccheck.log
-
 RUNFILES=("${DOT_D_PATH}"/*.sh)
 
 for ((len=${#RUNFILES[@]}, i=0; i < len; i++))
@@ -30,7 +30,7 @@ do
   F="${RUNFILES[i]}"
   [[ -f "$F" ]] || continue
 
-  unset RUNNAME RUNDESC runfile_exec RUNASROOT
+  unset RUNNAME RUNDESC runfile_exec RUNASROOT RUNREQUIRED RUNNORESULTS
 
   . "$F"
 
@@ -54,13 +54,16 @@ do
     RUNNAMES[i]="${F##*/}"
   fi
 
-  MSG="Run test \"${RUNNAMES[i]}\"?"
+  if (( RUNREQUIRED == 0 ))
+  then
+    /usr/bin/dialog --title 'Next command - koneetkiertoon.fi basic check' \
+                    --backtitle "$BACKTITLE" \
+                    --yesno "Run test \"${RUNNAMES[i]}\"?" 0 0
+    RETVAL=$?
+  else
+    RETVAL=0
+  fi
 
-  /usr/bin/dialog --title 'Next command - koneetkiertoon.fi basic check' \
-                  --backtitle '[Press ESC to exit]' \
-                  --yesno "$MSG" 0 0
-
-  RETVAL=$?
   DATE=$(/bin/date --rfc-3339=seconds)
 
   case $RETVAL in
@@ -73,17 +76,31 @@ do
   then
     DATE=$(/bin/date --rfc-3339=seconds)
     echo "$DATE Trying to to acquire root" >> "$LOGFILE"
+
     if ! acquire_root
     then
       DATE=$(/bin/date --rfc-3339=seconds)
-      echo "$DATE Failed to acquire root, skipping $F" >> "$LOGFILE"
-      continue
+      echo -n "$DATE Failed to acquire root, " >> "$LOGFILE"
+
+      if (( RUNREQUIRED == 0 ))
+      then
+        echo "skipping $F" >> "$LOGFILE"
+        continue
+      else
+        echo "exiting because $F is non-optional" >> "$LOGFILE"
+        exit 255
+      fi
     fi
+
     SUDO_KEPT_ALIVE=1
   fi
 
-  RUNMSGS[i]="$(runfile_exec)"
+  unset RUNOUT
+
+  runfile_exec
+
   RUNVALS[i]=$?
+  RUNMSGS[i]="$RUNOUT"
 
   # write script results to log file
   DATE=$(/bin/date --rfc-3339=seconds)
@@ -93,27 +110,36 @@ do
   (( i == 0 )) || SUMMARY="$SUMMARY"$'\n\n'
   SUMMARY="$SUMMARY${RUNNAMES[i]}"$'\n'"$(sed 's|.|=|g' <<< "${RUNNAMES[i]}")"$'\n'"${RUNMSGS[i]}"
 
-  # display script results
-  case ${RUNVALS[i]} in
-  0) MSG='Command completed successfully.' ;;
-  *) MSG="Command failed with return value ${RUNVALS[i]}" ;;
-  esac
-
-  if [[ -n ${RUNMSGS[i]} ]]
+  if (( RUNVALS[i] != 0 && RUNREQUIRED != 0 ))
   then
-    MSG="$MSG"$'\n'"Command output was:"$'\n\n'"${RUNMSGS[i]}"
+    SUMMARY="$SUMMARY"$'\n'"Exiting because mandatory script $F failed"
+    break
   fi
 
-  /usr/bin/dialog --title 'Command results - koneetkiertoon.fi basic check' \
-                  --backtitle '[Press ESC to exit]' \
-                  --msgbox "$MSG" 0 0
+  if (( RUNNORESULTS == 0 ))
+  then
+    # display script results
+    case ${RUNVALS[i]} in
+    0) MSG='Command completed successfully.' ;;
+    *) MSG="Command failed with return value ${RUNVALS[i]}" ;;
+    esac
 
-  RETVAL=$?
-  DATE=$(/bin/date --rfc-3339=seconds)
+    if [[ -n ${RUNMSGS[i]} ]]
+    then
+      MSG="$MSG"$'\n'"Command output was:"$'\n\n'"${RUNMSGS[i]}"
+    fi
 
-  case $RETVAL in
-  255) echo "$DATE ESC pressed, exiting" >> "$LOGFILE" ; exit 255 ;;
-  esac
+    /usr/bin/dialog --title 'Command results - koneetkiertoon.fi basic check' \
+                    --backtitle "$BACKTITLE" \
+                    --msgbox "$MSG" 0 0
+
+    RETVAL=$?
+    DATE=$(/bin/date --rfc-3339=seconds)
+
+    case $RETVAL in
+    255) echo "$DATE ESC pressed, exiting" >> "$LOGFILE" ; exit 255 ;;
+    esac
+  fi
 done
 
 clear

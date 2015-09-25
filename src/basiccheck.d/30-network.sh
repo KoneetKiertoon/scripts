@@ -2,7 +2,7 @@ RUNNAME="Network"
 
 runfile_exec()
 {
-  local ADDR MSG RET
+  local ADDR RET
 
   if [[ $1 ]]
   then
@@ -11,9 +11,8 @@ runfile_exec()
     ADDR='8.8.8.8'
   fi
 
-  MSG="$(ping -c 1 "$ADDR" 2>&1)"
+  RUNOUT="$(ping -c 1 "$ADDR" 2>&1)"
   RET=$?
 
-  echo "$MSG"
   return $RET
 }

@@ -12,7 +12,7 @@ runfile_exec()
 
   if (( RET == 0 ))
   then
-    echo "Hardware info written to $DEST"
+    RUNOUT="Hardware info written to $DEST"
   fi
 
   return $RET
