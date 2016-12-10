@@ -268,21 +268,28 @@ print_results ()
 
   TIME="${LOGDIR##*/}"
   ENDTIME="$(egrep '^([0-9]*\.[0-9]+|[0-9]+(\.[0-9]*)?) ([0-9]*\.[0-9]+|[0-9]+(\.[0-9]*)?)$' "$x"|tail -1|cut -d' ' -f1)"
-  H="$((${ENDTIME%%.*}/60))"
-  M="$((${ENDTIME%%.*}%60))"
-  S="$(bc -l <<< "60*0.${ENDTIME##*.}")"
+####
+  re='^[0-9]+([.][0-9]+)?$' # This represents a real number: "some digits then a  decimal, then some more digits"
+  if ! [[ $ENDTIME =~ $re ]] ; then
+     echo "error: cpu.log:n perässä jotain kakkaa!!!! Poista binääriroskaa ja aja uusiksi batterytest -r" >&2; exit 1
+  else
+    H="$((${ENDTIME%%.*}/60))"
+    M="$((${ENDTIME%%.*}%60))"
+    S="$(bc -l <<< "60*0.${ENDTIME##*.}")"
 
-  CPULOG="$(egrep '^([0-9]*\.[0-9]+|[0-9]+(\.[0-9]*)?) ([0-9]*\.[0-9]+|[0-9]+(\.[0-9]*)?)$' "$LOGDIR/cpu.log")"
-  LEN="$(wc -l <<< "$CPULOG"|cut -d' ' -f1)"
-  SUM=0
-  while read x; do
-    SUM="$(bc -l <<< "$SUM+${x##* }")"
-  done <<< "$CPULOG"
+    CPULOG="$(egrep '^([0-9]*\.[0-9]+|[0-9]+(\.[0-9]*)?) ([0-9]*\.[0-9]+|[0-9]+(\.[0-9]*)?)$' "$LOGDIR/cpu.log")"
+    LEN="$(wc -l <<< "$CPULOG"|cut -d' ' -f1)"
+    SUM=0
+    while read x; do
+      SUM="$(bc -l <<< "$SUM+${x##* }")"
+    done <<< "$CPULOG"
 
-  echo "Start:    $(date -d "@$TIME")"
-  echo "End:      $(date -d "@$(bc -l <<< "$TIME+(60*$ENDTIME)")")"
-  echo "Duration: ${H}h ${M}m ${S}s"
-  echo "CPU avg:  $(bc -l <<< "$SUM/$LEN")"
+    echo "Start:    $(date -d "@$TIME")"
+    echo "End:      $(date -d "@$(bc -l <<< "$TIME+(60*$ENDTIME)")")"
+    echo "Duration: ${H}h ${M}m ${S}s"
+    echo "CPU avg:  $(bc -l <<< "$SUM/$LEN")"
+  fi
+####
 }
 
 if [[ "$1" == '-r' ]]; then
