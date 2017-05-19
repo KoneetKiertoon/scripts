@@ -77,7 +77,7 @@ cpu_logger ()
         echo "$T $V" >> "$LOGDIR/cpu.log"
         ((_t=t))
         ((_e=e))
-        sleep 1
+        sleep 10 #sleep 10 sekuntia
       done
     ) &>/dev/null &
   else
@@ -271,7 +271,7 @@ print_results ()
 ####
   re='^[0-9]+([.][0-9]+)?$' # This represents a real number: "some digits then a  decimal, then some more digits"
   if ! [[ $ENDTIME =~ $re ]] ; then
-     echo "error: cpu.log:n perässä jotain kakkaa!!!! Poista binääriroskaa ja aja uusiksi batterytest -r" >&2; exit 1
+     echo "error: cpu.log:n perässä jotain kakkaa!!!! Poista binääriroskaa viimeisimmästä cpu.log:sta ja aja uusiksi batterytest -r" >&2; exit 1
   else
     H="$((${ENDTIME%%.*}/60))"
     M="$((${ENDTIME%%.*}%60))"
