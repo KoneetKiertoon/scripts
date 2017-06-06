@@ -1,0 +1,156 @@
+# alt-Tab -- to Firefox, where OP page is open with bill to be saved (can see 
+# "katso laskun tiedot" as an option
+KeyStrPress Alt_L
+KeyStrPress Tab
+KeyStrRelease Tab
+KeyStrRelease Alt_L
+Delay 2
+# Ctrl-F -- to FIND in page...
+KeyStrPress Control_L
+KeyStrPress f
+KeyStrRelease f
+KeyStrRelease Control_L
+Delay 1
+# KeyStr laskun tiedot
+#String laskun tiedot
+KeyStr l
+KeyStr a
+KeyStr s
+KeyStr k
+KeyStr u
+KeyStr n
+KeyStr space
+KeyStr t
+KeyStr i
+KeyStr e
+KeyStr d
+KeyStr o
+KeyStr t
+Delay 2
+# close search bar
+KeyStrPress Escape
+KeyStrRelease Escape
+Delay 1
+# Follow link
+KeyStrPress Return
+KeyStrRelease Return
+Delay 5
+# Ctrl-F -- to FIND in page...
+KeyStrPress Control_L
+KeyStrPress f
+KeyStrRelease f
+KeyStrRelease Control_L
+Delay 1
+# KeyStr tulostet  #"tulostet" saa riittää. Ongelmia tuplalyönnin kanssa
+KeyStr t
+KeyStr u
+KeyStr l
+KeyStr o
+KeyStr s
+KeyStr t
+KeyStr e
+KeyStr t
+Delay 2
+# close search bar
+KeyStrPress Escape
+KeyStrRelease Escape
+Delay 1
+# Follow link
+KeyStrPress Return
+KeyStrRelease Return
+Delay 5
+# Ctrl-P PRINT
+KeyStrPress Control_L
+KeyStrPress p
+KeyStrRelease p
+KeyStrRelease Control_L
+Delay 5
+# Shift focus to printer list
+KeyStrPress Tab
+KeyStrRelease Tab
+Delay 2
+# Key up to save to file
+KeyStrPress Page_Up
+KeyStrRelease Page_Up
+Delay 2
+# Shift focus to name to use and enter
+KeyStrPress Tab
+KeyStrRelease Tab
+KeyStrPress Return
+KeyStrRelease Return
+Delay 3
+# KeyStr lasku
+KeyStr l
+KeyStr a
+KeyStr s
+KeyStr k
+KeyStr u
+Delay 1
+# Enter
+KeyStrPress Return
+KeyStrRelease Return
+Delay 3
+# Shift focus to Tulosta-button, and press
+KeyStrPress Tab
+KeyStrRelease Tab
+KeyStrPress Tab
+KeyStrRelease Tab
+KeyStrPress Tab
+KeyStrRelease Tab
+KeyStrPress Tab
+KeyStrRelease Tab
+KeyStrPress Tab
+KeyStrRelease Tab
+KeyStrPress Tab
+KeyStrRelease Tab
+KeyStrPress Return
+KeyStrRelease Return
+Delay 8
+# Close window
+KeyStrPress Control_L
+KeyStrPress w
+KeyStrRelease w
+KeyStrRelease Control_L
+Delay 2
+# Ctrl-F -- to FIND in page...
+KeyStrPress Control_L
+KeyStrPress f
+KeyStrRelease f
+KeyStrRelease Control_L
+Delay 2
+# KeyStr paluu
+KeyStr p
+KeyStr a
+KeyStr l
+KeyStr u
+Delay 1
+KeyStr u
+Delay 2
+# close search bar
+KeyStrPress Escape
+KeyStrRelease Escape
+Delay 1
+# Follow link
+KeyStrPress Return
+KeyStrRelease Return
+Delay 5
+# Ctrl-F -- to FIND in page...
+KeyStrPress Control_L
+KeyStrPress f
+KeyStrRelease f
+KeyStrRelease Control_L
+Delay 2
+# KeyStr palaa #"pala" saa riittää. Ongelmia tuplalyönnin kanssa.
+KeyStr p
+KeyStr a
+KeyStr l
+KeyStr a
+Delay 2
+# close search bar
+KeyStrPress Escape
+KeyStrRelease Escape
+Delay 1
+# Follow link
+KeyStrPress Return
+KeyStrRelease Return
+Delay 3
