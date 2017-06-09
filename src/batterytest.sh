@@ -241,7 +241,7 @@ run_test ()
       VID="$TMP/$(ls -1tr "$TMP/"|grep -v "html$"|tail -1)"
       xset s off
       xset -dpms
-      mplayer --fs --ao=null "$VID"
+      mplayer -fs -ao null "$VID"      
       xset s
       xset +dpms
     fi
